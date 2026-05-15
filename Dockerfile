@@ -1,9 +1,10 @@
 FROM rust:1-slim-bookworm AS builder
+ARG CARGO_FEATURES=geoip
 WORKDIR /app
 COPY Cargo.toml ./
 COPY src/ src/
 COPY templates/ templates/
-RUN cargo build --release
+RUN cargo build --release --features "${CARGO_FEATURES}"
 
 FROM debian:bookworm-slim
 ARG UID=1000

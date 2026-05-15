@@ -38,3 +38,18 @@ pub fn resolve(reader: Option<&GeoReader>, ip: &str) -> String {
 pub fn resolve(_reader: Option<&GeoReader>, _ip: &str) -> String {
     "??".to_string()
 }
+
+pub fn resolve_from_header(headers: &axum::http::HeaderMap, name: &str) -> Option<String> {
+    let raw = headers.get(name)?.to_str().ok()?.trim();
+    if raw.len() != 2 {
+        return None;
+    }
+    let code: String = raw.chars().map(|c| c.to_ascii_uppercase()).collect();
+    if !code.chars().all(|c| c.is_ascii_uppercase()) {
+        return None;
+    }
+    if code == "XX" || code == "T1" {
+        return None;
+    }
+    Some(code)
+}

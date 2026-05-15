@@ -5,6 +5,7 @@ services:
       args:
         UID: ${UID:-1000}
         GID: ${GID:-1000}
+        CARGO_FEATURES: ${CARGO_FEATURES:-geoip}
     image: tally:latest
     user: "${UID:-1000}:${GID:-1000}"
     container_name: tally
@@ -17,6 +18,8 @@ services:
       RUST_LOG: ${RUST_LOG:-info,tally=info}
       PORT: "3000"
       DB_PATH: /data/tally.db
+      GEO_HEADER: ${GEO_HEADER:-cf-ipcountry}
+      GEOIP_DB: ${GEOIP_DB:-}
     volumes:
       - tally_data:/data
 

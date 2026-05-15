@@ -94,7 +94,8 @@ pub async fn pixel(
         set.insert(hash.clone())
     };
 
-    let country = geo::resolve(state.geo.as_ref(), &ip);
+    let country = geo::resolve_from_header(&headers, &state.geo_header)
+        .unwrap_or_else(|| geo::resolve(state.geo.as_ref(), &ip));
     let referrer_domain = ua::extract_referrer_domain(referrer);
     let path = ua::extract_referrer_path(referrer);
 

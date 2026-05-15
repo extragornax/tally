@@ -26,6 +26,7 @@ pub struct AppState {
     pub admin_token: String,
     pub sites: Option<HashSet<String>>,
     pub geo: Option<GeoReader>,
+    pub geo_header: String,
     pub uniques: UniqueSet,
 }
 
@@ -78,12 +79,19 @@ async fn main() -> Result<()> {
 
     let (tx, rx) = mpsc::channel::<HitRecord>(10_000);
 
+    let geo_header = std::env::var("GEO_HEADER")
+        .ok()
+        .map(|s| s.trim().to_ascii_lowercase())
+        .filter(|s| !s.is_empty())
+        .unwrap_or_else(|| "cf-ipcountry".to_string());
+
     let state = Arc::new(AppState {
         db: db.clone(),
         tx,
         admin_token,
         sites,
         geo,
+        geo_header,
         uniques: Mutex::new(HashMap::new()),
     });
 
