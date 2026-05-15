@@ -1,0 +1,16 @@
+services:
+  tally:
+    build: .
+    image: tally:latest
+    container_name: tally
+    restart: unless-stopped
+    ports:
+      - "${TALLY_PORT:-3000}:3000"
+    environment:
+      ADMIN_TOKEN: ${ADMIN_TOKEN:?ADMIN_TOKEN required}
+      SITES: ${SITES:-}
+      RUST_LOG: ${RUST_LOG:-info,tally=info}
+      PORT: "3000"
+      DB_PATH: /data/tally.db
+    volumes:
+      - ./data:/data
