@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>tally · extragornax</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@700;800&family=Fraunces:ital,wght@0,400;0,500;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F3ECD9;
+  --ink:#0E1424;
+  --ink-soft:#2A2F3E;
+  --mustard:#D9A326;
+  --vermilion:#E54B2A;
+  --teal:#2C6B7E;
+  --rule:rgba(14,20,36,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--paper);color:var(--ink);font-family:'Fraunces',Georgia,serif}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.28;mix-blend-mode:multiply;z-index:1;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.wrap{position:relative;z-index:2;max-width:980px;margin:0 auto;padding:40px 24px 80px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid var(--rule);padding-bottom:18px}
+h1{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:30px;margin:0;letter-spacing:-.02em}
+h1 .dot{color:var(--vermilion)}
+.label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.periods{display:flex;gap:6px}
+.periods button{
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  background:transparent;color:var(--ink-soft);border:1px solid var(--rule);
+  padding:6px 10px;cursor:pointer;border-radius:2px
+}
+.periods button.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+section{margin:36px 0}
+section h2{
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-soft);margin:0 0 14px;padding-bottom:6px;border-bottom:1px dashed var(--rule)
+}
+.hero{display:flex;gap:32px;align-items:baseline;flex-wrap:wrap}
+.hero .big{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:64px;line-height:1;letter-spacing:-.03em}
+.hero .sub{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:var(--ink-soft)}
+.delta{font-family:'Space Mono',monospace;font-size:12px;padding:2px 6px;border-radius:2px}
+.delta.up{color:var(--teal)}
+.delta.down{color:var(--vermilion)}
+.row{display:grid;grid-template-columns:200px 1fr 80px 60px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dotted var(--rule)}
+.row .name{font-family:'Fraunces',serif;font-size:15px}
+.row .bar{height:14px;background:var(--rule);border-radius:1px;overflow:hidden}
+.row .bar > span{display:block;height:100%;background:var(--teal)}
+.row .n{font-family:'Space Mono',monospace;font-size:13px;text-align:right}
+.row .u{font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right}
+.row a{color:inherit;text-decoration:none;border-bottom:1px solid transparent}
+.row a:hover{border-color:var(--vermilion)}
+.spark{width:100%;height:80px}
+.spark rect{fill:var(--teal)}
+.kv{display:grid;grid-template-columns:120px 1fr 70px 60px;gap:10px;align-items:center;padding:5px 0;border-bottom:1px dotted var(--rule)}
+.kv .k{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.06em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kv .bar{height:10px;background:var(--rule)}
+.kv .bar > span{display:block;height:100%;background:var(--mustard)}
+.kv .n{font-family:'Space Mono',monospace;font-size:12px;text-align:right}
+.kv .p{font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-soft);text-align:right}
+footer{margin-top:60px;border-top:1px solid var(--rule);padding-top:14px;font-family:'Space Mono',monospace;font-size:11px;color:var(--ink-soft);letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between}
+.empty{font-family:'Fraunces',serif;font-style:italic;color:var(--ink-soft);padding:8px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>tally<span class="dot">.</span></h1>
+      <div class="label">analytics · extragornax.fr</div>
+    </div>
+    <div class="periods" id="periods">
+      <button data-p="7d">7d</button>
+      <button data-p="30d" class="on">30d</button>
+      <button data-p="all">all</button>
+    </div>
+  </header>
+
+  <section>
+    <h2>résumé</h2>
+    <div class="hero">
+      <div class="big" id="total-views">—</div>
+      <div class="sub"><span id="total-uniques">—</span> visiteurs uniques</div>
+      <div id="delta"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>par site</h2>
+    <div id="by-site"></div>
+  </section>
+
+  <section>
+    <h2>trafic</h2>
+    <svg class="spark" id="spark" viewBox="0 0 600 80" preserveAspectRatio="none"></svg>
+  </section>
+
+  <section>
+    <h2>top referrers</h2>
+    <div id="referrers"></div>
+  </section>
+
+  <section>
+    <h2>pays</h2>
+    <div id="countries"></div>
+  </section>
+
+  <section>
+    <h2>appareils</h2>
+    <div id="devices"></div>
+  </section>
+
+  <footer>
+    <span>© extragornax</span>
+    <span>no cookies · no js tracking · rgpd ok</span>
+  </footer>
+</div>
+
+<script>
+const params = new URLSearchParams(location.search);
+const token = params.get('token') || '';
+let period = '30d';
+
+function fmt(n){ return new Intl.NumberFormat('fr-FR').format(n); }
+function pct(n,d){ if(!d) return 0; return Math.round((n/d)*100); }
+
+function deltaText(curr, prev){
+  const el = document.getElementById('delta');
+  if(!prev){ el.textContent = ''; el.className = ''; return; }
+  const diff = curr - prev;
+  const p = Math.round((diff / prev) * 100);
+  const sign = diff >= 0 ? '+' : '';
+  el.textContent = `${sign}${p}% vs période préc.`;
+  el.className = 'delta ' + (diff >= 0 ? 'up' : 'down');
+}
+
+function bar(pctVal){
+  return `<div class="bar"><span style="width:${Math.max(2,pctVal)}%"></span></div>`;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderBySite(list){
+  const c = document.getElementById('by-site');
+  if(!list.length){ c.innerHTML = '<div class="empty">aucune donnée</div>'; return; }
+  const max = Math.max(1, ...list.map(s => s.views));
+  c.innerHTML = list.map(s => `
+    <div class="row">
+      <div class="name"><a href="/site/${encodeURIComponent(s.site_id)}?token=${encodeURIComponent(token)}">${escapeHtml(s.site_id)}.extragornax.fr</a></div>
+      ${bar((s.views/max)*100)}
+      <div class="n">${fmt(s.views)}</div>
+      <div class="u">(${fmt(s.uniques)})</div>
+    </div>`).join('');
+}
+
+function renderSpark(daily){
+  const svg = document.getElementById('spark');
+  svg.innerHTML = '';
+  if(!daily.length) return;
+  const max = Math.max(1, ...daily.map(d => d.views));
+  const w = 600, h = 80;
+  const bw = w / daily.length;
+  daily.forEach((d,i)=>{
+    const bh = (d.views / max) * h;
+    const x = i * bw;
+    const y = h - bh;
+    const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x', x);
+    r.setAttribute('y', y);
+    r.setAttribute('width', Math.max(1, bw - 1));
+    r.setAttribute('height', bh);
+    r.setAttribute('rx', 1);
+    const t = document.createElementNS('http://www.w3.org/2000/svg','title');
+    t.textContent = `${d.date}: ${d.views} (${d.uniques})`;
+    r.appendChild(t);
+    svg.appendChild(r);
+  });
+}
+
+function renderList(id, items, keyField, total){
+  const c = document.getElementById(id);
+  if(!items.length){ c.innerHTML = '<div class="empty">—</div>'; return; }
+  const max = Math.max(1, ...items.map(x => x.count));
+  c.innerHTML = items.map(x => `
+    <div class="kv">
+      <div class="k">${escapeHtml(x[keyField] || '(direct)')}</div>
+      ${bar((x.count/max)*100)}
+      <div class="n">${fmt(x.count)}</div>
+      <div class="p">${total ? pct(x.count, total) : 0}%</div>
+    </div>`).join('');
+}
+
+function renderDevices(d){
+  const total = d.desktop + d.mobile + d.tablet;
+  const c = document.getElementById('devices');
+  const items = [
+    {k:'desktop',v:d.desktop},
+    {k:'mobile',v:d.mobile},
+    {k:'tablet',v:d.tablet},
+  ];
+  const max = Math.max(1, ...items.map(i => i.v));
+  c.innerHTML = items.map(i => `
+    <div class="kv">
+      <div class="k">${i.k}</div>
+      ${bar((i.v/max)*100)}
+      <div class="n">${fmt(i.v)}</div>
+      <div class="p">${total ? pct(i.v, total) : 0}%</div>
+    </div>`).join('');
+}
+
+async function load(){
+  const url = `/api/stats?period=${period}&token=${encodeURIComponent(token)}`;
+  const r = await fetch(url);
+  if(!r.ok){
+    document.querySelector('.wrap').innerHTML = '<h1 style="color:var(--vermilion)">unauthorized</h1><p style="font-family:Fraunces,serif">token missing or invalid.</p>';
+    return;
+  }
+  const s = await r.json();
+  document.getElementById('total-views').textContent = fmt(s.total_views);
+  document.getElementById('total-uniques').textContent = fmt(s.total_uniques);
+  deltaText(s.total_views, s.prev_period_views);
+  renderBySite(s.by_site);
+  renderSpark(s.daily);
+  const totalRef = s.referrers.reduce((a,b)=>a+b.count,0);
+  renderList('referrers', s.referrers, 'domain', totalRef);
+  const totalC = s.countries.reduce((a,b)=>a+b.count,0);
+  renderList('countries', s.countries, 'code', totalC);
+  renderDevices(s.devices);
+}
+
+document.getElementById('periods').addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if(!b) return;
+  document.querySelectorAll('#periods button').forEach(x => x.classList.remove('on'));
+  b.classList.add('on');
+  period = b.dataset.p;
+  load();
+});
+
+load();
+</script>
+</body>
+</html>
