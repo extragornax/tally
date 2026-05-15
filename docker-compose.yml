@@ -18,4 +18,7 @@ services:
       PORT: "3000"
       DB_PATH: /data/tally.db
     volumes:
-      - ./data:/data
+      - tally_data:/data
+
+volumes:
+  tally_data:
