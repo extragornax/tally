@@ -1,7 +1,12 @@
 services:
   tally:
-    build: .
+    build:
+      context: .
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
     image: tally:latest
+    user: "${UID:-1000}:${GID:-1000}"
     container_name: tally
     restart: unless-stopped
     ports:
